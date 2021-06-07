@@ -1,0 +1,2 @@
+C:\Users\aaron\Documents\Unreal Projects\StartProject\Survival_Game\Intermediate\Build\Win64\UE4Editor\Development\Survival_Game\Definitions.Survival_Game.h
+c:\users\aaron\documents\unreal projects\startproject\survival_game\source\survival_game\Survival_Game.h
