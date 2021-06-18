@@ -50,6 +50,12 @@ ASurvivalGameCharacter::ASurvivalGameCharacter()
 	backpackMesh->SetupAttachment(GetMesh());
 	backpackMesh->SetMasterPoseComponent(GetMesh());
 
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+
+	GetMesh()->SetOwnerNoSee(true);
+
+	sprintSpeed = GetCharacterMovement()->MaxWalkSpeed * 1.5;
+	walkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
 }
 
@@ -72,5 +78,79 @@ void ASurvivalGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAxis("MoveForward", this, &ASurvivalGameCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ASurvivalGameCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("Turn", this, &ASurvivalGameCharacter::Turn);
+	PlayerInputComponent->BindAxis("LookUp", this, &ASurvivalGameCharacter::LookUp);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASurvivalGameCharacter::StartSprinting);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASurvivalGameCharacter::StopSprinting);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ASurvivalGameCharacter::StartCrouching);
+	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ASurvivalGameCharacter::StopCrouching);
+}
+
+bool ASurvivalGameCharacter::CanSprint() const
+{
+	return false;
+}
+
+void ASurvivalGameCharacter::StartSprinting()
+{
+	SetSprinting(true);
+}
+
+void ASurvivalGameCharacter::StopSprinting()
+{
+	SetSprinting(false);
+}
+
+void ASurvivalGameCharacter::SetSprinting(const bool bNewSprinting)
+{
+	if (bNewSprinting == bSprinting)
+	{
+		return;
+	}
+
+	bSprinting = bNewSprinting;
+	GetCharacterMovement()->MaxWalkSpeed = bSprinting ? sprintSpeed : walkSpeed;
+}
+
+void ASurvivalGameCharacter::MoveForward(float val)
+{
+	if (val != 0.0f) {
+		AddMovementInput(GetActorForwardVector(), val);
+	}
+}
+
+void ASurvivalGameCharacter::MoveRight(float val)
+{
+	if (val != 0.0f) {
+		AddMovementInput(GetActorRightVector(), val);
+	}
+}
+
+void ASurvivalGameCharacter::LookUp(float val)
+{
+	if (val != 0.0f) {
+		AddControllerPitchInput(val);
+	}
+}
+
+void ASurvivalGameCharacter::Turn(float val)
+{
+	if (val != 0.0f) {
+		AddControllerYawInput(val);
+	}
+}
+
+void ASurvivalGameCharacter::StartCrouching()
+{
+	Crouch();
+}
+
+void ASurvivalGameCharacter::StopCrouching()
+{
+	UnCrouch();
 }
 
