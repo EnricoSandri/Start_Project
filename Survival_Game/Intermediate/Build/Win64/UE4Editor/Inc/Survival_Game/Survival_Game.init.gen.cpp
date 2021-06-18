@@ -21,7 +21,7 @@ void EmptyLinkFunctionForGeneratedCodeSurvival_Game_init() {}
 				nullptr,
 				0,
 				PKG_CompiledIn | 0x00000000,
-				0x54B2B37A,
+				0xBD5978B2,
 				0x0856459B,
 				METADATA_PARAMS(nullptr, 0)
 			};
