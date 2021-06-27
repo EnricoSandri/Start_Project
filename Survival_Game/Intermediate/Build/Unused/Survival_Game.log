@@ -1,13 +1,13 @@
 ﻿  Using 'git status' to determine working set for adaptive non-unity build (Z:\Unreal\Start_Project).
-  Invalidating makefile for Survival_GameEditor (SurvivalGameCharacter.cpp modified)
+  Invalidating makefile for Survival_GameEditor (Item.gen.cpp modified)
   Building Survival_GameEditor...
   Using Visual Studio 2019 14.27.29112 toolchain (C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110) and Windows 10.0.20348.0 SDK (C:\Program Files (x86)\Windows Kits\10).
   Building 4 actions with 12 processes...
-    [1/4] SurvivalGameCharacter.cpp
+    [1/4] Survival_Game.init.gen.cpp
     [2/4] UE4Editor-Survival_Game.lib
        Creating library Z:\Unreal\Start_Project\Survival_Game\Intermediate\Build\Win64\UE4Editor\Development\Survival_Game\UE4Editor-Survival_Game.lib and object Z:\Unreal\Start_Project\Survival_Game\Intermediate\Build\Win64\UE4Editor\Development\Survival_Game\UE4Editor-Survival_Game.exp
     [3/4] UE4Editor-Survival_Game.dll
        Creating library Z:\Unreal\Start_Project\Survival_Game\Intermediate\Build\Win64\UE4Editor\Development\Survival_Game\UE4Editor-Survival_Game.suppressed.lib and object Z:\Unreal\Start_Project\Survival_Game\Intermediate\Build\Win64\UE4Editor\Development\Survival_Game\UE4Editor-Survival_Game.suppressed.exp
     [4/4] Survival_GameEditor.target
-  Total time in Parallel executor: 1.73 seconds
-  Total execution time: 3.76 seconds
+  Total time in Parallel executor: 1.46 seconds
+  Total execution time: 3.46 seconds

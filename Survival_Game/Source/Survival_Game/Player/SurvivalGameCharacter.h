@@ -6,6 +6,26 @@
 #include "GameFramework/Character.h"
 #include "SurvivalGameCharacter.generated.h"
 
+USTRUCT()
+struct FInteractionData
+{
+	GENERATED_BODY()
+		
+	FInteractionData()
+	{
+		viewedInteractionComponent = nullptr;
+		lastInteractionChechTime = 0.0f;
+		bInteractHeld = false;
+	}
+
+	UPROPERTY()
+		class UInteractionComponent* viewedInteractionComponent;
+	UPROPERTY()
+		float lastInteractionChechTime;
+	UPROPERTY()
+		bool bInteractHeld;
+};
+
 UCLASS()
 class SURVIVAL_GAME_API ASurvivalGameCharacter : public ACharacter
 {
@@ -71,4 +91,33 @@ protected:
 	void Turn(float val);
 	void StartCrouching();
 	void StopCrouching();
+
+	// Interaction variables
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+		float interactionCheckFrequence;
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+		float interactionCheckDistance;
+
+	UPROPERTY()
+		FInteractionData interactionData;
+
+	FTimerHandle timeHandle_Interact;
+
+	void PerformInteractionCheck();
+	void CouldNotFindInteraction();
+	void FoundNewInteraction(UInteractionComponent* interactable);
+	void BeginInteract();
+	void EndInteract();
+	void Interact();
+
+	FORCEINLINE class UInteractionComponent* GetInteractable() const
+	{
+		return interactionData.viewedInteractionComponent;
+	}
+
+public:
+	bool IsInteracting() const;
+	float GetRemainingInteractionTime() const;
 };

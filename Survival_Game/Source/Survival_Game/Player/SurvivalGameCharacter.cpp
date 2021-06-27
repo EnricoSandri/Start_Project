@@ -6,6 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/cameraComponent.h"
+#include "Survival_Game/Components/InteractionComponent.h"
 
 
 // Sets default values
@@ -57,6 +58,8 @@ ASurvivalGameCharacter::ASurvivalGameCharacter()
 	sprintSpeed = GetCharacterMovement()->MaxWalkSpeed * 1.5;
 	walkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
+	interactionCheckDistance = 1000.0f;
+	interactionCheckFrequence = 0.0f;
 }
 
 // Called when the game starts or when spawned
@@ -70,7 +73,10 @@ void ASurvivalGameCharacter::BeginPlay()
 void ASurvivalGameCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (GetWorld()->TimeSince(interactionData.lastInteractionChechTime) > interactionCheckFrequence)
+	{
+		PerformInteractionCheck();
+	}
 }
 
 // Called to bind functionality to input
@@ -88,6 +94,8 @@ void ASurvivalGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASurvivalGameCharacter::StopSprinting);
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ASurvivalGameCharacter::StartCrouching);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ASurvivalGameCharacter::StopCrouching);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ASurvivalGameCharacter::BeginInteract);
+	PlayerInputComponent->BindAction("Interact", IE_Released, this, &ASurvivalGameCharacter::EndInteract);
 }
 
 bool ASurvivalGameCharacter::CanSprint() const
@@ -154,3 +162,115 @@ void ASurvivalGameCharacter::StopCrouching()
 	UnCrouch();
 }
 
+void ASurvivalGameCharacter::PerformInteractionCheck()
+{
+	if (GetController() == nullptr) 
+	{
+		return;
+	}
+
+	interactionData.lastInteractionChechTime = GetWorld()->GetTimeSeconds();
+
+	FVector eyeLoc;
+	FRotator eyeRot;
+
+	GetController()->GetPlayerViewPoint(eyeLoc, eyeRot);
+	FVector raystart = eyeLoc;
+	FVector rayEnd = eyeRot.Vector() * interactionCheckDistance + raystart;
+
+	FHitResult rayHit;
+
+	FCollisionQueryParams queryParams;
+	queryParams.AddIgnoredActor(this);
+
+	if (GetWorld()->LineTraceSingleByChannel(rayHit, raystart, rayEnd, ECC_Visibility, queryParams)) 
+	{
+		if (rayHit.GetActor()) 
+		{
+			if (UInteractionComponent* interactionComponent = Cast< UInteractionComponent>(rayHit.GetActor()->GetComponentByClass(UInteractionComponent::StaticClass()))) 
+			{
+				float distance = (raystart - rayHit.ImpactPoint).Size();
+				if (interactionComponent != GetInteractable() && distance <= interactionComponent->interactionDistance)
+				{
+					FoundNewInteraction(interactionComponent);
+				}
+				else if (GetInteractable() && distance > interactionComponent->interactionDistance) 
+				{
+					CouldNotFindInteraction();
+				}
+				return;
+			}
+		}
+	}
+	CouldNotFindInteraction();
+}
+
+void ASurvivalGameCharacter::CouldNotFindInteraction()
+{
+	if (GetWorldTimerManager().IsTimerActive(timeHandle_Interact))
+	{
+		GetWorldTimerManager().ClearTimer(timeHandle_Interact);
+	}
+	if (UInteractionComponent* interact = GetInteractable()) 
+	{
+		interact->EndFocus(this);
+		if (interactionData.bInteractHeld) {
+			EndInteract();
+		}
+	}
+	interactionData.viewedInteractionComponent = nullptr;
+}
+
+void ASurvivalGameCharacter::FoundNewInteraction(UInteractionComponent* interactable)
+{
+	EndInteract();
+	if (UInteractionComponent* oldIntreactable = GetInteractable()) {
+		oldIntreactable->EndFocus(this);
+	}
+	interactionData.viewedInteractionComponent = interactable;
+	interactable->BeginFocus(this);
+}
+
+void ASurvivalGameCharacter::BeginInteract()
+{
+	interactionData.bInteractHeld = true;
+	if (UInteractionComponent* interactable = GetInteractable()) {
+		interactable->BeginInteract(this);
+		if (FMath::IsNearlyZero(interactable->interactionTime)) {
+			Interact();
+		}
+		else {
+			GetWorldTimerManager().SetTimer(timeHandle_Interact, this, &ASurvivalGameCharacter::Interact, interactable->interactionTime, false);
+		}
+	}
+}
+
+void ASurvivalGameCharacter::EndInteract()
+{
+	interactionData.bInteractHeld = false;
+	GetWorldTimerManager().ClearTimer(timeHandle_Interact);
+	if (UInteractionComponent* interactable = GetInteractable()) {
+		interactable->EndInteract(this);
+	}
+}
+
+void ASurvivalGameCharacter::Interact()
+{
+	interactionData.bInteractHeld = false;
+	GetWorldTimerManager().ClearTimer(timeHandle_Interact);
+	if (UInteractionComponent* interactable = GetInteractable()) 
+	{
+		interactable->Interact(this);
+	}
+
+}
+
+bool ASurvivalGameCharacter::IsInteracting() const
+{
+	return GetWorldTimerManager().IsTimerActive(timeHandle_Interact);
+}
+
+float ASurvivalGameCharacter::GetRemainingInteractionTime() const
+{
+	return GetWorldTimerManager().GetTimerRemaining(timeHandle_Interact);
+}
