@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Item.generated.h"
-[[[[[[[[[[[[[[[[[[[[]] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]
+
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnItemModified);
 
@@ -25,7 +25,7 @@ class SURVIVAL_GAME_API UItem : public UObject
 {
 	GENERATED_BODY()
 
-/*protected:
+protected:
 	virtual class UWorld* GetWorld() const override;
 
 #if WITH_EDITOR
@@ -33,6 +33,8 @@ class SURVIVAL_GAME_API UItem : public UObject
 #endif
 
 public:
+
+	UItem();
 
 	UPROPERTY(Transient)
 		class UWorld* world;
@@ -50,7 +52,7 @@ public:
 		FText itemDescription;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item")
-		FText userAction;
+		FText useAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item")
 		EItemRearity rearity;
@@ -61,8 +63,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item")
 		bool bStackSize;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item")
+		bool bStackable;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item", meta = (ClampMin = 2, EditCondition = bStackable))
-		int32 maxStacSize;
+		int32 maxStackSize;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item")
 		TSubclassOf<class UItemTooltip> iteamTooltip;
@@ -71,10 +76,10 @@ public:
 		int32 quantity;
 
 	UPROPERTY(BlueprintAssignable)
-		FOnItemModified onItemmodified;
+		FOnItemModified onItemModified;
 
 	UPROPERTY()
-		class UInventoryComponent* owniungInventory;
+		class UInventoryComponent* owningInventory;
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		void SetQuantity(const int32 newQuantity);
@@ -86,14 +91,18 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		FORCEINLINE	 int32 GetStackWieght() const
+		FORCEINLINE	 int32 GetStackWeight() const
 	{
 		return quantity * weight;
 	}
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		virtual bool ShouldShowInInventory() const;
+	
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnUse(class ASurvivalGameCharacter* character);
 
 	virtual void Use(ASurvivalGameCharacter* character);
-	virtual void UseAddedTOInventory(ASurvivalGameCharacter* character); */
+	virtual void AddedToInventory(UInventoryComponent* inventory);
 };

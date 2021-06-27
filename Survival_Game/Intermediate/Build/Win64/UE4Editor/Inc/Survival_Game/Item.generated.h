@@ -8,6 +8,7 @@
 #include "UObject/ScriptMacros.h"
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
+class ASurvivalGameCharacter;
 #ifdef SURVIVAL_GAME_Item_generated_h
 #error "Item.generated.h already included, missing '#pragma once' in Item.h"
 #endif
@@ -21,8 +22,30 @@ static inline void FOnItemModified_DelegateWrapper(const FMulticastScriptDelegat
 
 
 #define Survival_Game_Source_Survival_Game_Items_Item_h_26_SPARSE_DATA
-#define Survival_Game_Source_Survival_Game_Items_Item_h_26_RPC_WRAPPERS
-#define Survival_Game_Source_Survival_Game_Items_Item_h_26_RPC_WRAPPERS_NO_PURE_DECLS
+#define Survival_Game_Source_Survival_Game_Items_Item_h_26_RPC_WRAPPERS \
+ \
+	DECLARE_FUNCTION(execShouldShowInInventory); \
+	DECLARE_FUNCTION(execGetStackWeight); \
+	DECLARE_FUNCTION(execGetQuantity); \
+	DECLARE_FUNCTION(execSetQuantity);
+
+
+#define Survival_Game_Source_Survival_Game_Items_Item_h_26_RPC_WRAPPERS_NO_PURE_DECLS \
+ \
+	DECLARE_FUNCTION(execShouldShowInInventory); \
+	DECLARE_FUNCTION(execGetStackWeight); \
+	DECLARE_FUNCTION(execGetQuantity); \
+	DECLARE_FUNCTION(execSetQuantity);
+
+
+#define Survival_Game_Source_Survival_Game_Items_Item_h_26_EVENT_PARMS \
+	struct Item_eventOnUse_Parms \
+	{ \
+		ASurvivalGameCharacter* character; \
+	};
+
+
+#define Survival_Game_Source_Survival_Game_Items_Item_h_26_CALLBACK_WRAPPERS
 #define Survival_Game_Source_Survival_Game_Items_Item_h_26_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesUItem(); \
@@ -43,7 +66,7 @@ public: \
 
 #define Survival_Game_Source_Survival_Game_Items_Item_h_26_STANDARD_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
-	NO_API UItem(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get()); \
+	NO_API UItem(const FObjectInitializer& ObjectInitializer); \
 	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(UItem) \
 	DECLARE_VTABLE_PTR_HELPER_CTOR(NO_API, UItem); \
 DEFINE_VTABLE_PTR_HELPER_CTOR_CALLER(UItem); \
@@ -55,8 +78,6 @@ public:
 
 
 #define Survival_Game_Source_Survival_Game_Items_Item_h_26_ENHANCED_CONSTRUCTORS \
-	/** Standard constructor, called after all reflected properties have been initialized */ \
-	NO_API UItem(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get()) : Super(ObjectInitializer) { }; \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	NO_API UItem(UItem&&); \
@@ -64,17 +85,21 @@ private: \
 public: \
 	DECLARE_VTABLE_PTR_HELPER_CTOR(NO_API, UItem); \
 DEFINE_VTABLE_PTR_HELPER_CTOR_CALLER(UItem); \
-	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(UItem)
+	DEFINE_DEFAULT_CONSTRUCTOR_CALL(UItem)
 
 
 #define Survival_Game_Source_Survival_Game_Items_Item_h_26_PRIVATE_PROPERTY_OFFSET
-#define Survival_Game_Source_Survival_Game_Items_Item_h_23_PROLOG
+#define Survival_Game_Source_Survival_Game_Items_Item_h_23_PROLOG \
+	Survival_Game_Source_Survival_Game_Items_Item_h_26_EVENT_PARMS
+
+
 #define Survival_Game_Source_Survival_Game_Items_Item_h_26_GENERATED_BODY_LEGACY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
 	Survival_Game_Source_Survival_Game_Items_Item_h_26_PRIVATE_PROPERTY_OFFSET \
 	Survival_Game_Source_Survival_Game_Items_Item_h_26_SPARSE_DATA \
 	Survival_Game_Source_Survival_Game_Items_Item_h_26_RPC_WRAPPERS \
+	Survival_Game_Source_Survival_Game_Items_Item_h_26_CALLBACK_WRAPPERS \
 	Survival_Game_Source_Survival_Game_Items_Item_h_26_INCLASS \
 	Survival_Game_Source_Survival_Game_Items_Item_h_26_STANDARD_CONSTRUCTORS \
 public: \
@@ -87,6 +112,7 @@ public: \
 	Survival_Game_Source_Survival_Game_Items_Item_h_26_PRIVATE_PROPERTY_OFFSET \
 	Survival_Game_Source_Survival_Game_Items_Item_h_26_SPARSE_DATA \
 	Survival_Game_Source_Survival_Game_Items_Item_h_26_RPC_WRAPPERS_NO_PURE_DECLS \
+	Survival_Game_Source_Survival_Game_Items_Item_h_26_CALLBACK_WRAPPERS \
 	Survival_Game_Source_Survival_Game_Items_Item_h_26_INCLASS_NO_PURE_DECLS \
 	Survival_Game_Source_Survival_Game_Items_Item_h_26_ENHANCED_CONSTRUCTORS \
 private: \
